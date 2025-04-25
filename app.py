@@ -26,18 +26,12 @@ import streamlit as st
 # Safe loading of Google Sheets secret
 json_key = st.secrets.get("google_sheets", None)
 
-if json_key is None:
-    st.warning("⚠️ 'google_sheets' secret not found. Skipping Google Sheets integration.")
-else:
-    # ✅ Continue with Google Sheets related code here
-    st.success("✅ Google Sheets secret loaded successfully!")
-    st.json(json_key)
-
-json_key = st.secrets.get("google_sheets", None)
+json_key = st.secrets.get("google_sheets")
 
 if json_key is None:
-    st.warning("⚠️ 'google_sheets' secret not found. Skipping Google Sheets logic.")
+    st.warning("⚠️ 'google_sheets' secret not found. Google Sheets related code skipped.")
 else:
+    st.success("✅ Google Sheets secret loaded successfully.")
     # Use json_key normally here
 
 
