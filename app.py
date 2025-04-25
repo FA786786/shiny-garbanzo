@@ -16,20 +16,3 @@ if st.button("Login to Zerodha"):
     webbrowser.open(login_url)
     st.write("https://developers.kite.trade/apps/e82vof9ld8ng6p58")
 
-# Step 2: Request Token से Access Token बनाएं
-request_token = st.text_input("यहाँ Request Token पेस्ट करें:")
-if st.button("Generate Access Token"):
-    try:
-        data = kite.generate_session(request_token, api_secret=api_secret)
-        access_token = data["access_token"]
-        st.success("Access Token मिला: " + access_token)
-        # इस token को भविष्य में इस्तेमाल के लिए सेव कर सकते हैं
-        kite.set_access_token(access_token)
-
-        # उदाहरण: प्रोफाइल दिखाएं
-        profile = kite.profile()
-        st.write("आपका प्रोफाइल:")
-        st.json(profile)
-
-    except Exception as e:
-        st.error(f"Error: {e}")
