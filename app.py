@@ -1,36 +1,65 @@
 import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
+from oauth2client.service_account import ServiceAccountCredentials
+from kiteconnect import KiteConnect
 
-# Define the Google Sheets scope
+# -----------------------------
+# Google Sheets Setup
+# -----------------------------
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-# Load credentials from Streamlit secrets
 json_key = st.secrets["google_sheets"]
 creds = ServiceAccountCredentials.from_json_keyfile_dict(json_key, scope)
-
-# Authorize the gspread client
 client = gspread.authorize(creds)
-
-# Open the sheet using the spreadsheet ID (not name)
 sheet = client.open_by_key("1-fB69hGqWPhCJ80gOhzDeVCvbxDH5y3cFDlqWZy757k").sheet1
 
-# Streamlit app UI
-st.title("🔐 Zerodha API Credential Saver")
+# -----------------------------
+# Zerodha App Config
+# -----------------------------
+st.title("🔑 Zerodha Access Token Generator")
 
-st.markdown("Enter your **Zerodha API Key**, **API Secret**, and **Access Token** to store it securely in Google Sheets.")
+api_key = st.text_input("🔐 API Key", placeholder="Your Zerodha API Key")
+api_secret = st.text_input("🧾 API Secret", placeholder="Your API Secret", type="password")
+redirect_url = "https://127.0.0.1"  # You must configure this in Zerodha app settings
 
-# Input fields
-api_key = st.text_input("API Key")
-api_secret = st.text_input("API Secret")
-access_token = st.text_input("Access Token")
+# Step 1: Generate login URL
+if api_key:
+    kite = KiteConnect(api_key=api_key)
+    login_url = kite.login_url()
+    st.markdown(f"👉 [Click here to login to Zerodha]({login_url})")
+    request_token = st.text_input("📥 Paste the Request Token from redirected URL")
 
-# On button click, append data to the sheet
-if st.button("💾 Save to Google Sheet"):
-    if api_key and api_secret and access_token:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sheet.append_row([api_key, api_secret, access_token, timestamp])
-        st.success("✅ Credentials saved successfully!")
-    else:
-        st.warning("⚠️ Please fill in all fields before submitting.")
+    # Step 2: Generate access token
+    if st.button("⚙️ Generate & Save Access Token"):
+        if api_secret and request_token:
+            try:
+                data = kite.generate_session(request_token, api_secret=api_secret)
+                access_token = data["access_token"]
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                # Save to Google Sheet
+                sheet.append_row([api_key, api_secret, access_token, timestamp])
+                st.success("✅ Access token generated and saved successfully!")
+
+            except Exception as e:
+                st.error(f"❌ Failed to generate access token: {e}")
+        else:
+            st.warning("⚠️ Please enter both API Secret and Request Token.")
+
+# -----------------------------
+# Use existing access token from Sheet
+# -----------------------------
+st.subheader("📄 Use Last Saved Token")
+try:
+    rows = sheet.get_all_values()
+    if len(rows) > 1:
+        latest = rows[-1]
+        saved_key, saved_secret, saved_token, saved_time = latest
+        st.code(f"API Key: {saved_key}\nAccess Token: {saved_token}\nTimestamp: {saved_time}")
+
+        # Example: You can now create an active KiteConnect instance
+        kite = KiteConnect(api_key=saved_key)
+        kite.set_access_token(saved_token)
+        st.success("🔗 Access token loaded and client initialized.")
+except Exception as e:
+    st.error(f"⚠️ Could not read from sheet or initialize KiteConnect: {e}")
