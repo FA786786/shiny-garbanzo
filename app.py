@@ -14,7 +14,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_dict(json_key, scope)
 client = gspread.authorize(creds)
 
 # Open the Google Sheet by name
-sheet = client.open("ZerodhaAPISheet").sheet1
+sheet = client.open_by_key("1-fB69hGqWPhCJ80gOhzDeVCvbxDH5y3cFDlqWZy757k").sheet1
 
 # Display header
 st.title("🔐 Zerodha API Credential Manager")
@@ -37,5 +37,5 @@ if st.button("Save to Google Sheet"):
 st.subheader("📄 Last 5 Entries")
 rows = sheet.get_all_values()
 st.table(rows[-5:] if len(rows) >= 5 else rows)
-sheet = client.open_by_key("1-fB69hGqWPhCJ80gOhzDeVCvbxDH5y3cFDlqWZy757k").sheet1
+
 
