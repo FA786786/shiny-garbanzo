@@ -21,6 +21,13 @@ st.title("📈 Zerodha Kite Connect - Streamlit Demo")
 
 
 request_token = st.text_input("https://developers.kite.trade/apps:")
+json_key = st.secrets.get("google_sheets", None)
+
+if json_key is None:
+    st.warning("⚠️ 'google_sheets' secret not found. Skipping Google Sheets logic.")
+else:
+    # Use json_key normally here
+
 
 
 if st.button("⚙️ Generate Access Token"):
