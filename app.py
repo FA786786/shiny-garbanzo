@@ -26,14 +26,19 @@ import streamlit as st
 # Safe loading of Google Sheets secret
 json_key = st.secrets.get("google_sheets", None)
 
-json_key = st.secrets.get("google_sheets")
+import streamlit as st
+import json
+from auth import get_google_sheet
+
+# 🛡️ Safe way to load the secret:
+json_key = st.secrets.get("google_sheets", None)
 
 if json_key is None:
-    st.warning("⚠️ 'google_sheets' secret not found. Google Sheets related code skipped.")
+    st.warning("⚠️ Google Sheets key not found. Skipping Google Sheet integration.")
+    sheet = None  # fallback in case needed
 else:
-    st.success("✅ Google Sheets secret loaded successfully.")
-    # Use json_key normally here
-
+    sheet_url = "https://docs.google.com/spreadsheets/d/your_sheet_id_here"
+    sheet = get_google_sheet(sheet_url, json_key)
 
 
 if st.button("⚙️ Generate Access Token"):
