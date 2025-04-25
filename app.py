@@ -4,18 +4,17 @@ from kiteconnect import KiteConnect
 import streamlit as st
 import webbrowser
 
-api_key = "आपका_API_KEY"
-api_secret = "आपका_API_SECRET"
+api_key = "e82vof9ld8ng6p58_API_KEY"
+api_secret = "qeawu5ihfnvh5sj4hmlymoat30z4ij33_API_SECRET"
 redirect_url = "http://127.0.0.1:8000"
 
 kite = KiteConnect(api_key=api_key)
 
-# Step 1: Request Token के लिए लिंक दिखाएं
 st.title("Zerodha Kite API Connect")
 if st.button("Login to Zerodha"):
     login_url = kite.login_url()
     webbrowser.open(login_url)
-    st.write("ब्राउज़र में Zerodha लॉगिन करें और URL से request_token कॉपी करें।")
+    st.write("https://developers.kite.trade/apps/e82vof9ld8ng6p58")
 
 # Step 2: Request Token से Access Token बनाएं
 request_token = st.text_input("यहाँ Request Token पेस्ट करें:")
