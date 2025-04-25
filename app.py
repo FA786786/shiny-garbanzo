@@ -1,18 +1,61 @@
-pip install streamlit kiteconnect
-# kite_app.py
-from kiteconnect import KiteConnect
 import streamlit as st
+from kiteconnect import KiteConnect
 import webbrowser
+import os
 
-api_key = "e82vof9ld8ng6p58_API_KEY"
-api_secret = "qeawu5ihfnvh5sj4hmlymoat30z4ij33_API_SECRET"
-redirect_url = "http://127.0.0.1:8000"
 
-kite = KiteConnect(api_key=api_key)
+API_KEY = "e82vof9ld8ng6p58your"
+API_SECRET = "qeawu5ihfnvh5sj4hmlymoat30z4ij33"
+REDIRECT_URL = "http://127.0.0.1:8000"
 
-st.title("Zerodha Kite API Connect")
-if st.button("Login to Zerodha"):
-    login_url = kite.login_url()
+kite = KiteConnect(api_key=API_KEY)
+
+st.set_page_config(page_title="Zerodha API Demo", layout="centered")
+st.title("📈 Zerodha Kite Connect - Streamlit Demo")
+
+
+
+    login_url = https://developers.kite.trade/apps()
     webbrowser.open(login_url)
-    st.write("https://developers.kite.trade/apps/e82vof9ld8ng6p58")
+    st.info(https://developers.kite.trade/apps.")
 
+
+request_token = st.text_input("https://developers.kite.trade/apps:")
+
+
+if st.button("⚙️ Generate Access Token"):
+    try:
+        session = kite.generate_session(request_token, api_secret=API_SECRET)
+        access_token = session["access_token"]
+        kite.set_access_token(access_token)
+
+        # Save to file
+        with open("access_token.txt", "w") as f:
+            f.write(access_token)
+
+        st.success("✅ Access token generated and saved!")
+        st.code(access_token)
+
+        # Show profile
+        profile = kite.profile()
+        st.subheader("👤 Profile Info")
+        st.json(profile)
+
+    except Exception as e:
+        st.error(f"❌ Error: {e}")
+
+# 📂 Use Saved Token
+if st.button("📂 Use Saved Token"):
+    try:
+        if os.path.exists("access_token.txt"):
+            with open("access_token.txt", "r") as f:
+                token = f.read()
+            kite.set_access_token(token)
+
+            profile = kite.profile()
+            st.subheader("👤 Profile Info (from saved token)")
+            st.json(profile)
+        else:
+            st.warning("Token file not found. Please login first.")
+    except Exception as e:
+        st.error(f"❌ Error: {e}")
