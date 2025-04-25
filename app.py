@@ -37,3 +37,4 @@ if st.button("Save to Google Sheet"):
 st.subheader("📄 Last 5 Entries")
 rows = sheet.get_all_values()
 st.table(rows[-5:] if len(rows) >= 5 else rows)
+sheet = client.open("ZerodhaAPISheet").sheet1
